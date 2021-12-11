@@ -7,15 +7,17 @@ export class UI {
     held = false;
 
     addText(t) {
-        // (text/getText), x, y, [c, textSize]
+        // (text/getText), x, y, [c, textSize, horizAlign, vertAlign]
         t.c = t.c || color(255);
         t.textSize = t.textSize || 36;
+        t.horizAlign = t.horizAlign || CENTER;
+        t.vertAlign = t.vertAlign || CENTER;
         this.text.push(t);
         return t;
     }
 
     addButton(btn) {
-        // (text/getText), box, action, [c1, c2, textSize]
+        // (text/getText), box, action, [c1, c2, textSize, hidden]
         btn.c1 = btn.c1 || color('#A9B4C2');
         btn.c2 = btn.c2 || color('#7D858E');
         btn.textSize = btn.textSize || 36;
@@ -25,7 +27,7 @@ export class UI {
 
     mousePressed() {
         for (let v of this.buttons) {
-            if (utils.mouseInRect(v.box) && v.action) {
+            if (utils.mouseInRect(v.box) && v.action && !v.hidden) {
                 v.action();
                 this.held = true;
             }
@@ -37,14 +39,16 @@ export class UI {
     }
 
     draw() {
-        textAlign(CENTER, CENTER);
         for (let v of this.text) {
+            textAlign(v.horizAlign, v.vertAlign);
             fill(v.c);
             textSize(v.textSize);
             let t = v.text || v.getText();
             text(t, v.x, v.y + 3);
         }
+        textAlign(CENTER, CENTER);
         for (let v of this.buttons) {
+            if (v.hidden) { continue; }
             if (utils.mouseInRect(v.box)) {
                 utils.setPointer();
                 fill(v.c2);
